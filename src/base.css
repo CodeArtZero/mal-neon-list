@@ -125,7 +125,7 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
   text-shadow: 0 0 14px rgba(0, 229, 255, .5);
 }
 .cover-block .image-container::after {
-  content: "Back to watching more and keeping the list up to date.";   /* free text */
+  content: "Once Again I returned.";   /* free text */
   display: block;
   max-width: 560px;
   margin-top: 6px;
