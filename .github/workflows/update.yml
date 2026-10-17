@@ -1,0 +1,29 @@
+name: Update neon.css
+
+on:
+  schedule:
+    - cron: "17 4 * * *"      # every day, 04:17 UTC
+  workflow_dispatch:           # or run it by hand from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build neon.css from the live MAL list
+        shell: pwsh
+        run: ./build.ps1 -User SynthesizedSoul
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add neon.css
+          git diff --cached --quiet || (git commit -m "Update neon.css" && git push)
+
+      - name: Refresh the CDN
+        run: curl -fsS "https://purge.jsdelivr.net/gh/${{ github.repository }}@main/neon.css" || true
