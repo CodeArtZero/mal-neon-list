@@ -159,6 +159,16 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
   transition: color .2s, border-color .2s, box-shadow .2s;
 }
 .status-menu-container .status-menu .status-button:after { display: none; }
+/* tab order: Completed, Watching, On Hold, Plan to Watch. "All Anime" and "Dropped" are hidden */
+.status-menu-container .status-menu .status-button.all_anime,
+.status-menu-container .status-menu .status-button.dropped { display: none; }
+.status-menu-container .status-menu .status-button.completed   { order: 1; }
+.status-menu-container .status-menu .status-button.watching    { order: 2; }
+.status-menu-container .status-menu .status-button.onhold      { order: 3; }
+.status-menu-container .status-menu .status-button.plantowatch { order: 4; }
+.status-menu-container .status-menu .search-container          { order: 9; }
+/* stats strip only on the Completed tab */
+.list-unit:not(.completed) .list-stats { display: none !important; }
 .status-menu-container .status-menu .status-button.watching { --a: var(--green); }
 .status-menu-container .status-menu .status-button.completed { --a: var(--cyan); }
 .status-menu-container .status-menu .status-button.onhold { --a: var(--amber); }

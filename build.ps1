@@ -79,30 +79,13 @@ $bars
 </svg>
 "@
 
-# ---------- 5. stat cards ----------
-# MAL renders "Eps" and "Days" for every tab in its page HTML; read them from there
-$tabs = @(
-  @{ status = 7; cls = "all_anime" }, @{ status = 1; cls = "watching" }, @{ status = 2; cls = "completed" },
-  @{ status = 3; cls = "onhold" },    @{ status = 4; cls = "dropped" },  @{ status = 6; cls = "plantowatch" }
-)
-$tabStats = @{}
-foreach ($tab in $tabs) {
-  $html = (Invoke-WebRequest -UseBasicParsing -Headers $ua "https://myanimelist.net/animelist/$User`?status=$($tab.status)").Content
-  if ($html -match "Eps:\s*(\d+),\s*Days:\s*([\d.]*)") {
-    $tabStats[$tab.cls] = @{ eps = [int]$Matches[1]; days = $Matches[2] }
-  } else { Write-Warning "Could not read stats for status $($tab.status)" }
-}
-$allEps  = if ($tabStats["all_anime"]) { $tabStats["all_anime"].eps.ToString("N0", $inv) } else { "-" }
-$allDays = if ($tabStats["all_anime"]) { $tabStats["all_anime"].days } else { "-" }
+# ---------- 5. stat cards (Completed tab only) ----------
+# MAL renders "Eps" and "Days" in its page HTML; read them from the Completed tab
+$html = (Invoke-WebRequest -UseBasicParsing -Headers $ua "https://myanimelist.net/animelist/$User`?status=2").Content
+if ($html -notmatch "Eps:\s*(\d+),\s*Days:\s*([\d.]*)") { throw "Could not read Eps/Days from the Completed tab" }
+$cEps  = ([int]$Matches[1]).ToString("N0", $inv)
+$cDays = $Matches[2]
 
-$cards = @(
-  @{ n = "$($all.Count)";  l = "TITLES";        c = "#9fb4ff" },
-  @{ n = "$cCompleted";    l = "COMPLETED";     c = "#00e5ff" },
-  @{ n = "$cWatching";     l = "WATCHING";      c = "#2dff8f" },
-  @{ n = "$cPlan";         l = "PLAN TO WATCH"; c = "#8b5cff" },
-  @{ n = $allEps;          l = "EPISODES";      c = "#ffc531" },
-  @{ n = $allDays;         l = "DAYS";          c = "#ff2bd6" }
-)
 function Build-Cards($items, [int]$W, [int]$cols, [int]$gap, [int]$cardH, [int]$numSize) {
   $rows = [Math]::Ceiling($items.Count / $cols)
   $cw   = ($W - ($cols - 1) * $gap) / $cols
@@ -119,23 +102,11 @@ function Build-Cards($items, [int]$W, [int]$cols, [int]$gap, [int]$cardH, [int]$
   $height = $rows * $cardH + ($rows - 1) * $gap
   return "<svg xmlns='http://www.w3.org/2000/svg' width='$W' height='$height' viewBox='0 0 $W $height' $fam>$glowDef$out</svg>"
 }
-$statsWide   = Build-Cards $cards 1392 6 14 84 30
-$statsNarrow = Build-Cards $cards 700 3 12 78 26
+$statsSvg = Build-Cards @(
+  @{ n = $cEps;  l = "EPISODES"; c = "#ffc531" },
+  @{ n = $cDays; l = "DAYS";     c = "#ff2bd6" }
+) 454 2 14 84 30
 
-# small Eps + Days strip for every other tab
-$tabRules = ""
-foreach ($cls in @("watching", "completed", "onhold", "dropped", "plantowatch")) {
-  $ts = $tabStats[$cls]
-  if (-not $ts -or $ts.eps -eq 0) {
-    $tabRules += ".list-unit.$cls .list-stats { display: none !important; }`n"
-    continue
-  }
-  $pair = @(
-    @{ n = $ts.eps.ToString("N0", $inv); l = "EPISODES"; c = "#ffc531" },
-    @{ n = $ts.days;                     l = "DAYS";     c = "#ff2bd6" }
-  )
-  $tabRules += ".list-unit.$cls .list-stats { background-image: $(To-DataUri (Build-Cards $pair 454 2 14 84 30)); }`n"
-}
 
 # ---------- 6. cover rules ----------
 $covers = New-Object System.Text.StringBuilder
@@ -168,35 +139,8 @@ $($covers.ToString())
 }
 @media (max-width: 1180px) { .list-container::before { display: none; } }
 
-/* stat cards replace the plain text strip on the "All Anime" tab */
-.list-unit.all_anime .list-stats {
-  font-size: 0;
-  line-height: 0;
-  color: transparent;
-  height: auto;
-  padding: 0;
-  margin-bottom: 42px;
-  position: relative;
-  aspect-ratio: 1392 / 84;
-  background: $(To-DataUri $statsWide) no-repeat center / 100% 100%;
-  border: 0;
-  border-radius: 0;
-}
-.list-unit.all_anime .list-stats::before,
-.list-unit.all_anime .list-stats .score-label { display: none; }
-.list-unit.all_anime .list-stats a.floatRightHeader {
-  position: absolute;
-  right: 4px;
-  bottom: -26px;
-  font-size: 12px;
-  line-height: 1;
-}
-@media (max-width: 820px) {
-  .list-unit.all_anime .list-stats { aspect-ratio: 700 / 168; background-image: $(To-DataUri $statsNarrow); }
-}
-
-/* all other tabs: only Episodes + Days (numbers read from MAL at build time) */
-.list-unit:not(.all_anime) .list-stats {
+/* Completed tab: the MAL text strip becomes two cards, Episodes and Days (numbers read from MAL at build time) */
+.list-unit.completed .list-stats {
   font-size: 0;
   line-height: 0;
   color: transparent;
@@ -206,21 +150,20 @@ $($covers.ToString())
   margin-bottom: 42px;
   position: relative;
   aspect-ratio: 454 / 84;
-  background: no-repeat center / 100% 100%;
+  background: $(To-DataUri $statsSvg) no-repeat center / 100% 100%;
   border: 0;
   border-radius: 0;
   box-shadow: none;
 }
-.list-unit:not(.all_anime) .list-stats::before,
-.list-unit:not(.all_anime) .list-stats .score-label { display: none; }
-.list-unit:not(.all_anime) .list-stats a.floatRightHeader {
+.list-unit.completed .list-stats::before,
+.list-unit.completed .list-stats .score-label { display: none; }
+.list-unit.completed .list-stats a.floatRightHeader {
   position: absolute;
   left: 4px;
   bottom: -26px;
   font-size: 12px;
   line-height: 1;
 }
-$tabRules
 "@
 
 $utf8 = New-Object System.Text.UTF8Encoding $false     # no BOM
