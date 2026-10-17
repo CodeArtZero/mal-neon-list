@@ -115,7 +115,7 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
 .cover-block .image-container.hide { display: block; width: auto; padding: 0; }
 .cover-block #cover-image { display: none; }
 .cover-block .image-container::before {
-  content: "MY ANIME LIST";                                   /* title line */
+  content: "The Lolimancer";                                   /* title line */
   display: block;
   margin-top: 12px;
   font-size: 14px;
