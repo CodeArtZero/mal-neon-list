@@ -376,6 +376,7 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
+  padding-right: 96px;                 /* room for the Filters button that sits on this line */
 }
 .list-table tr.list-table-header::before {
   content: "Sort by";
