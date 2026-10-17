@@ -2,7 +2,7 @@
 #   * high-res cover URLs for every anime (MAL "l.webp" = 424x600 instead of the 192x272 list thumbnail)
 #   * hero graphic (score distribution + mean score)
 #   * Episodes/Days stat cards
-# neon.css is hosted on GitHub (served by jsDelivr); MAL only contains a one-line @import of it.
+# neon.css is hosted on GitHub Pages; MAL only contains a one-line @import of it.
 # With -GitHubUser and -Repo it also writes the stub PASTE-INTO-MAL.css (needed only once).
 #
 #   powershell -ExecutionPolicy Bypass -File build.ps1 [-GitHubUser name -Repo repo]
@@ -174,7 +174,7 @@ Write-Host ("Wrote {0} ({1:N0} bytes)" -f $outFile, $size)
 
 # the small stub that goes into MAL: MAL strips url() from pasted CSS but leaves an @import of an external file alone
 if ($GitHubUser -and $Repo) {
-  $importUrl = "https://cdn.jsdelivr.net/gh/$GitHubUser/$Repo@main/neon.css"
+  $importUrl = "https://$($GitHubUser.ToLower()).github.io/$Repo/neon.css"
   $stub = "/* Neon Cube - the whole design is loaded from the file below */`n@\import `"$importUrl`";`n"
   [IO.File]::WriteAllText((Join-Path $PSScriptRoot "PASTE-INTO-MAL.css"), $stub, $utf8)
   Write-Host "Wrote PASTE-INTO-MAL.css (import stub for $importUrl)"
