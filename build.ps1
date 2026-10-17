@@ -6,7 +6,7 @@
 # With -GitHubUser and -Repo it also writes the stub PASTE-INTO-MAL.css (needed only once).
 #
 #   powershell -ExecutionPolicy Bypass -File build.ps1 [-GitHubUser name -Repo repo]
-param([string]$User = "SynthesizedSoul", [string]$GitHubUser = "", [string]$Repo = "")
+param([string]$User = "SynthesizedSoul", [string]$GitHubUser = "CodeArtZero", [string]$Repo = "mal-neon-list")
 
 $ErrorActionPreference = "Stop"
 $inv = [Globalization.CultureInfo]::InvariantCulture
@@ -165,6 +165,16 @@ $($covers.ToString())
   line-height: 1;
 }
 "@
+
+# artwork slots: images/left.*, images/right.*, images/mid.* are picked up automatically
+$pagesBase = "https://$($GitHubUser.ToLower()).github.io/$Repo"
+$artVars = ""
+foreach ($slot in @("left", "right", "mid")) {
+  $f = Get-ChildItem (Join-Path $PSScriptRoot "images") -ErrorAction SilentlyContinue |
+       Where-Object { $_.BaseName -eq $slot -and $_.Extension -match '^\.(png|gif|webp|jpe?g|svg)$' } | Select-Object -First 1
+  if ($f) { $artVars += "  --art-$slot`: url($pagesBase/images/$($f.Name));`n"; Write-Host "Artwork slot '$slot': $($f.Name)" }
+}
+if ($artVars) { $gen += "`n/* artwork from images/ */`n:root {`n$artVars}`n" }
 
 $utf8 = New-Object System.Text.UTF8Encoding $false     # no BOM
 $outFile = Join-Path $PSScriptRoot "neon.css"

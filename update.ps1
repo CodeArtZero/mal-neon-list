@@ -9,7 +9,7 @@ Set-Location $PSScriptRoot
 
 & (Join-Path $PSScriptRoot "build.ps1")
 
-git add neon.css
-if (-not (git status --porcelain neon.css)) { Write-Host "neon.css did not change, nothing to publish."; return }
+git add -A neon.css images
+if (-not (git status --porcelain neon.css images)) { Write-Host "neon.css did not change, nothing to publish."; return }
 git commit -m $Message
 git push

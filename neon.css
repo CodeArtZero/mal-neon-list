@@ -94,9 +94,47 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
   background: transparent;
   border: 0;
 }
-.cover-block { width: auto; margin: 0; padding: 36px 0 44px; text-align: left; }
+/* Name plate: framed box with name, title and your own text.
+   EDIT HERE: the three texts are the content: values below (name, title line, free text). */
+.cover-block {
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 28px 0 34px;
+  padding: 22px 36px 24px;
+  text-align: left;
+  border: 2px solid transparent;
+  border-radius: 20px;
+  background:
+    linear-gradient(rgba(10, 10, 22, .78), rgba(10, 10, 22, .78)) padding-box,
+    linear-gradient(120deg, var(--cyan), var(--violet) 55%, var(--magenta)) border-box;
+  box-shadow: 0 0 36px -12px var(--violet), inset 0 0 40px -28px var(--cyan);
+}
+/* MAL's (empty) cover-image box is reused for the title and the free text */
+.cover-block .image-container.hide { display: block; width: auto; padding: 0; }
+.cover-block #cover-image { display: none; }
+.cover-block .image-container::before {
+  content: "MY ANIME LIST";                                   /* title line */
+  display: block;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .28em;
+  color: var(--cyan);
+  text-shadow: 0 0 14px rgba(0, 229, 255, .5);
+}
+.cover-block .image-container::after {
+  content: "Back to watching more and keeping the list up to date.";   /* free text */
+  display: block;
+  max-width: 560px;
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
 .cover-block::before {
-  content: "SynthesizedSoul";
+  content: "SynthesizedSoul";                                  /* name */
   display: block;
   font-size: clamp(34px, 6vw, 72px);
   font-weight: 700;
@@ -107,15 +145,6 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
   background-clip: text;
   color: transparent;
   filter: drop-shadow(0 0 22px rgba(139, 92, 255, .45));
-}
-.cover-block::after {
-  content: "// anime list";
-  display: block;
-  margin-top: 10px;
-  font-size: 14px;
-  letter-spacing: .28em;
-  text-transform: uppercase;
-  color: var(--muted);
 }
 
 /* ---------- Status tabs as pills ---------- */
@@ -254,6 +283,30 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
   box-shadow: 0 0 18px -4px var(--magenta);
   text-shadow: none;
 }
+/* Filters button sits on the "Sort by" line, right aligned: the title row is moved below the stats
+   and pulled up over the sort row; the "Completed" heading is dropped (the active tab already says it) */
+.list-unit { display: flex; flex-direction: column; }
+.list-unit .list-stats { order: 1; }
+.list-unit .list-status-title {
+  order: 2;
+  height: 30px;
+  margin-bottom: -30px;
+  padding: 0;
+  position: relative;
+  z-index: 3;
+  pointer-events: none;
+}
+.list-unit .list-status-title .text { display: none; }
+.list-unit .list-status-title .stats { margin-left: auto; pointer-events: auto; }
+.list-unit .list-status-title .stats a {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 30px;
+  padding: 0 14px;
+}
+.list-unit .list-table { order: 3; }
+.list-unit .loading-space { order: 4; }
 /* Stats strip is always visible, the toggle button is not needed */
 #show-stats-button { display: none !important; }
 /* live stats strip (always correct, used on every tab except the "All Anime" dashboard) */
@@ -346,7 +399,11 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
 .list-table .list-table-header .header-title.progress,
 .list-table .list-table-header .header-title.rated { display: block; }
 .list-table .list-table-header .header-title a.link.sort {
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 30px;
+  padding: 0 12px;
   border-radius: 999px;
   background: var(--surface) !important;
   border: 1px solid var(--line);
@@ -613,6 +670,41 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
 #footer-block { background: transparent; border-top: 1px solid var(--line); color: var(--muted); }
 #copyright, #recaptcha-terms, #recaptcha-terms a { color: var(--muted); }
 
+/* ---------- Artwork slots ----------
+   Put images named left / right / mid (png, gif, webp, jpg or svg) into the images/ folder.
+   build.ps1 finds them and fills the variables below; empty slots draw nothing. */
+:root { --art-left: none; --art-right: none; --art-mid: none; }
+
+/* side gutters: only on wide screens, fixed to the bottom corners */
+@media (min-width: 1700px) {
+  html::before, html::after {
+    content: "";
+    position: fixed;
+    bottom: 0;
+    width: calc((100vw - 1440px) / 2 - 24px);
+    height: 80vh;
+    z-index: 0;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+  html::before { left: 12px;  background-image: var(--art-left);  background-position: left bottom; }
+  html::after  { right: 12px; background-image: var(--art-right); background-position: right bottom; }
+}
+/* middle slot: between the name plate and the score card */
+@media (min-width: 1500px) {
+  .header::after {
+    content: "";
+    position: absolute;
+    top: 76px;
+    right: calc(24px + 440px + 20px);
+    width: 280px;
+    height: 170px;
+    background: var(--art-mid) no-repeat right center / contain;
+    pointer-events: none;
+  }
+}
+
 /* ---------- Phones ---------- */
 @media (max-width: 700px) {
   :root { --tile: 148px; --gap: 12px; }
@@ -826,12 +918,12 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
 [href^="/anime/32729/"]{--i:url(https://cdn.myanimelist.net/images/anime/1415/102477l.webp)}
 [href^="/anime/41899/"]{--i:url(https://cdn.myanimelist.net/images/anime/1988/115708l.webp)}
 [href^="/anime/6773/"]{--i:url(https://cdn.myanimelist.net/images/anime/9/32539l.webp)}
+[href^="/anime/23273/"]{--i:url(https://cdn.myanimelist.net/images/anime/1405/143284l.webp)}
 [href^="/anime/44037/"]{--i:url(https://cdn.myanimelist.net/images/anime/1723/117854l.webp)}
 [href^="/anime/40586/"]{--i:url(https://cdn.myanimelist.net/images/anime/1888/133089l.webp)}
 [href^="/anime/32105/"]{--i:url(https://cdn.myanimelist.net/images/anime/12/79556l.webp)}
 [href^="/anime/48556/"]{--i:url(https://cdn.myanimelist.net/images/anime/1449/117797l.webp)}
 [href^="/anime/36432/"]{--i:url(https://cdn.myanimelist.net/images/anime/1583/93857l.webp)}
-[href^="/anime/23273/"]{--i:url(https://cdn.myanimelist.net/images/anime/1405/143284l.webp)}
 [href^="/anime/41457/"]{--i:url(https://cdn.myanimelist.net/images/anime/1987/117507l.webp)}
 [href^="/anime/32998/"]{--i:url(https://cdn.myanimelist.net/images/anime/13/80515l.webp)}
 [href^="/anime/49520/"]{--i:url(https://cdn.myanimelist.net/images/anime/1612/120636l.webp)}
