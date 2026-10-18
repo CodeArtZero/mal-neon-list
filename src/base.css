@@ -697,10 +697,10 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
   .header::after {
     content: "";
     position: absolute;
-    top: 6px;
+    top: 30px;
     right: calc(24px + 440px + 24px);
-    width: 270px;
-    height: 345px;
+    width: 320px;
+    height: 455px;
     background: var(--art-mid) no-repeat center bottom / contain;
     filter: drop-shadow(0 8px 22px rgba(0, 0, 0, .55));
     pointer-events: none;
