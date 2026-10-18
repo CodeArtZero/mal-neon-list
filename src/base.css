@@ -722,13 +722,13 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
 body.ownlist::after {
   content: "";
   position: fixed;
-  inset: 0 -6vw;                      /* wider than the screen: pushes the circles outward */
+  inset: 0;
   z-index: -1;
   pointer-events: none;
   background: var(--art-frame) center / cover no-repeat;
-  opacity: .6;
-  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 6%, transparent 15%, transparent 85%, #000 94%, #000 100%);
-  mask-image: linear-gradient(90deg, #000 0%, #000 6%, transparent 15%, transparent 85%, #000 94%, #000 100%);
+  opacity: .8;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 2%, transparent 14%, transparent 86%, #000 98%, #000 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 2%, transparent 14%, transparent 86%, #000 98%, #000 100%);
 }
 @media (max-width: 899px) { body.ownlist::after { display: none; } }
 
