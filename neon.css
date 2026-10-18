@@ -715,7 +715,22 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
 /* ---------- Artwork slots ----------
    Put images named left / right / mid (png, gif, webp, jpg or svg) into the images/ folder.
    build.ps1 finds them and fills the variables below; empty slots draw nothing. */
-:root { --art-left: none; --art-right: none; --art-mid: none; }
+:root { --art-left: none; --art-right: none; --art-mid: none; --art-frame: none; }
+
+/* edge decoration (images/frame.*): a full-screen picture whose middle fades out, so only the
+   outer edges show. It sits behind all content. Adjust the percentages to show more or less. */
+body.ownlist::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--art-frame) center / cover no-repeat;
+  opacity: .9;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 3%, transparent 17%, transparent 83%, #000 97%, #000 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 3%, transparent 17%, transparent 83%, #000 97%, #000 100%);
+}
+@media (max-width: 899px) { body.ownlist::after { display: none; } }
 
 /* side gutters: only on wide screens, fixed to the bottom corners */
 @media (min-width: 1700px) {
@@ -1132,4 +1147,5 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
 /* artwork from images/ */
 :root {
   --art-mid: url(https://codeartzero.github.io/mal-neon-list/images/middle.png);
+  --art-frame: url(https://codeartzero.github.io/mal-neon-list/images/frame.webp);
 }
