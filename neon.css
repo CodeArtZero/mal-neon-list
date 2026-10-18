@@ -307,6 +307,47 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
 }
 .list-unit .list-table { order: 3; }
 .list-unit .loading-space { order: 4; }
+
+/* Search sits on the same line, to the right of Filters (desktop only).
+   It lives in the tab bar, so it is placed relative to the bar: right under it, and 126px lower on the
+   Completed tab where the Episodes/Days cards (84px + 42px margin) come first. While the tab bar is
+   stuck to the top of the screen the search goes back into that bar. */
+@media (min-width: 701px) {
+  .status-menu-container { position: relative; }
+  .status-menu-container .search-container {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-left: 0;
+    height: 30px;
+    z-index: 4;
+  }
+  .list-container:has(.list-unit.completed) .status-menu-container .search-container { top: calc(100% + 126px); }
+  .status-menu-container.fixed .search-container { position: static; margin-left: auto; }
+  .status-menu-container .search-container #search-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-size: 12px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .status-menu-container .search-container #search-button:hover {
+    border-color: var(--magenta);
+    box-shadow: 0 0 18px -4px var(--magenta);
+  }
+  .status-menu-container .search-container #search-box input { height: 30px; }
+  /* Filters moves left to make room for the search button, and further while the search box is open */
+  .list-unit .list-status-title .stats { margin-right: 40px; transition: margin-right .2s ease; }
+  .list-container:has(#search-box.open) .list-unit .list-status-title .stats { margin-right: 232px; }
+  .list-container:has(.status-menu-container.fixed) .list-unit .list-status-title .stats { margin-right: 0; }
+}
 /* Stats strip is always visible, the toggle button is not needed */
 #show-stats-button { display: none !important; }
 /* live stats strip (always correct, used on every tab except the "All Anime" dashboard) */
