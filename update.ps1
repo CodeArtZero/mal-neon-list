@@ -6,6 +6,7 @@ param([string]$Message = "Update neon.css")
 
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
+git pull --rebase --autostash
 
 & (Join-Path $PSScriptRoot "build.ps1")
 

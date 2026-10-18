@@ -1,12 +1,26 @@
 name: Update neon.css
 
+# neon.css is generated from src/base.css (+ your MAL list + images/). It is rebuilt
+#  - whenever you change src/, images/ or build.ps1 (also when edited on github.com)
+#  - every day, to pick up list changes
+#  - on demand from the Actions tab
 on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "images/**"
+      - "build.ps1"
   schedule:
     - cron: "17 4 * * *"      # every day, 04:17 UTC
-  workflow_dispatch:           # or run it by hand from the Actions tab
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: update-neon
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -14,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build neon.css from the live MAL list
+      - name: Build neon.css from src/base.css and the live MAL list
         shell: pwsh
         run: ./build.ps1 -User SynthesizedSoul
 
@@ -23,4 +37,4 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@users.noreply.github.com"
           git add neon.css
-          git diff --cached --quiet || (git commit -m "Update neon.css" && git push)
+          git diff --cached --quiet || (git commit -m "Rebuild neon.css" && git push)
