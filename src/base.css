@@ -697,11 +697,12 @@ body.ownlist ::-webkit-scrollbar-thumb:hover { background: var(--violet); }
   .header::after {
     content: "";
     position: absolute;
-    top: 76px;
-    right: calc(24px + 440px + 20px);
-    width: 280px;
-    height: 170px;
-    background: var(--art-mid) no-repeat right center / contain;
+    top: 6px;
+    right: calc(24px + 440px + 24px);
+    width: 270px;
+    height: 345px;
+    background: var(--art-mid) no-repeat center bottom / contain;
+    filter: drop-shadow(0 8px 22px rgba(0, 0, 0, .55));
     pointer-events: none;
   }
 }

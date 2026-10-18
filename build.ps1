@@ -169,9 +169,10 @@ $($covers.ToString())
 # artwork slots: images/left.*, images/right.*, images/mid.* are picked up automatically
 $pagesBase = "https://$($GitHubUser.ToLower()).github.io/$Repo"
 $artVars = ""
+$slotNames = @{ left = @("left"); right = @("right"); mid = @("mid", "middle", "center") }
 foreach ($slot in @("left", "right", "mid")) {
   $f = Get-ChildItem (Join-Path $PSScriptRoot "images") -ErrorAction SilentlyContinue |
-       Where-Object { $_.BaseName -eq $slot -and $_.Extension -match '^\.(png|gif|webp|jpe?g|svg)$' } | Select-Object -First 1
+       Where-Object { $slotNames[$slot] -contains $_.BaseName.ToLower() -and $_.Extension -match '^\.(png|gif|webp|jpe?g|svg)$' } | Select-Object -First 1
   if ($f) { $artVars += "  --art-$slot`: url($pagesBase/images/$($f.Name));`n"; Write-Host "Artwork slot '$slot': $($f.Name)" }
 }
 if ($artVars) { $gen += "`n/* artwork from images/ */`n:root {`n$artVars}`n" }
